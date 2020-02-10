@@ -10,6 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable;
 
 import com.joseluisestevez.msa.webflux.models.documents.Product;
@@ -18,6 +20,7 @@ import com.joseluisestevez.msa.webflux.service.ProductService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@SessionAttributes("product")
 @Controller
 public class ProductController {
 
@@ -45,13 +48,14 @@ public class ProductController {
     }
 
     @PostMapping("/form")
-    public Mono<String> save(Product product) {
+    public Mono<String> save(Product product, SessionStatus status) {
+        status.setComplete();
         return productService.save(product).doOnNext(p -> LOGGER.info("product=[{}]", p)).thenReturn("redirect:/list");
     }
 
     @GetMapping("/form/{id}")
     public Mono<String> edit(Model model, @PathVariable String id) {
-        Mono<Product> product = productService.findById(id).doOnNext(p -> LOGGER.info("product[{}]", p));
+        Mono<Product> product = productService.findById(id).doOnNext(p -> LOGGER.info("product[{}]", p)).defaultIfEmpty(new Product());
 
         model.addAttribute("product", product);
         model.addAttribute("title", "Product edit");
