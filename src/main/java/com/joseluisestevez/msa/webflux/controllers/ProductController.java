@@ -10,8 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable;
 
-import com.joseluisestevez.msa.webflux.dao.ProductDao;
 import com.joseluisestevez.msa.webflux.models.documents.Product;
+import com.joseluisestevez.msa.webflux.service.ProductService;
 
 import reactor.core.publisher.Flux;
 
@@ -21,11 +21,11 @@ public class ProductController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductController.class);
 
     @Autowired
-    private ProductDao productDao;
+    private ProductService productService;
 
     @GetMapping({ "/list", "/" })
     public String list(Model model) {
-        Flux<Product> products = productDao.findAll().map(product -> {
+        Flux<Product> products = productService.findAll().map(product -> {
             product.setName(product.getName().toUpperCase());
             return product;
         });
@@ -39,7 +39,7 @@ public class ProductController {
 
     @GetMapping("/list-data-driver")
     public String listDataDriver(Model model) {
-        Flux<Product> products = productDao.findAll().map(product -> {
+        Flux<Product> products = productService.findAll().map(product -> {
             product.setName(product.getName().toUpperCase());
             return product;
         }).delayElements(Duration.ofSeconds(1));
@@ -54,7 +54,7 @@ public class ProductController {
 
     @GetMapping("/list-full")
     public String listFull(Model model) {
-        Flux<Product> products = productDao.findAll().map(product -> {
+        Flux<Product> products = productService.findAll().map(product -> {
             product.setName(product.getName().toUpperCase());
             return product;
         }).repeat(5000);
@@ -66,7 +66,7 @@ public class ProductController {
 
     @GetMapping("/list-chunked")
     public String listChunked(Model model) {
-        Flux<Product> products = productDao.findAll().map(product -> {
+        Flux<Product> products = productService.findAll().map(product -> {
             product.setName(product.getName().toUpperCase());
             return product;
         }).repeat(5000);
