@@ -49,6 +49,18 @@ public class ProductController {
         model.addAttribute("products", new ReactiveDataDriverContextVariable(products, 1));
 
         model.addAttribute("title", "Product list");
-        return "list-data-driver";
+        return "list";
+    }
+
+    @GetMapping("/list-full")
+    public String listFull(Model model) {
+        Flux<Product> products = productDao.findAll().map(product -> {
+            product.setName(product.getName().toUpperCase());
+            return product;
+        }).repeat(5000);
+
+        model.addAttribute("products", products);
+        model.addAttribute("title", "Product list");
+        return "list";
     }
 }
