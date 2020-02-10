@@ -46,7 +46,6 @@ public class ProductController {
 
         products.subscribe(product -> LOGGER.info("product: [{}]", product.getName()));
 
-        model.addAttribute("products", products);
         model.addAttribute("products", new ReactiveDataDriverContextVariable(products, 1));
 
         model.addAttribute("title", "Product list");
