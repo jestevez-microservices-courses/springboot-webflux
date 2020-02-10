@@ -49,6 +49,6 @@ public class ProductController {
         model.addAttribute("products", new ReactiveDataDriverContextVariable(products, 1));
 
         model.addAttribute("title", "Product list");
-        return "list";
+        return "list-data-driver";
     }
 }
