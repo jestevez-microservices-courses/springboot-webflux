@@ -25,10 +25,7 @@ public class ProductController {
 
     @GetMapping({ "/list", "/" })
     public String list(Model model) {
-        Flux<Product> products = productService.findAll().map(product -> {
-            product.setName(product.getName().toUpperCase());
-            return product;
-        });
+        Flux<Product> products = productService.findAllWitNameUppercase();
 
         products.subscribe(product -> LOGGER.info("product: [{}]", product.getName()));
 
@@ -39,10 +36,7 @@ public class ProductController {
 
     @GetMapping("/list-data-driver")
     public String listDataDriver(Model model) {
-        Flux<Product> products = productService.findAll().map(product -> {
-            product.setName(product.getName().toUpperCase());
-            return product;
-        }).delayElements(Duration.ofSeconds(1));
+        Flux<Product> products = productService.findAllWitNameUppercase().delayElements(Duration.ofSeconds(1));
 
         products.subscribe(product -> LOGGER.info("product: [{}]", product.getName()));
 
@@ -54,10 +48,7 @@ public class ProductController {
 
     @GetMapping("/list-full")
     public String listFull(Model model) {
-        Flux<Product> products = productService.findAll().map(product -> {
-            product.setName(product.getName().toUpperCase());
-            return product;
-        }).repeat(5000);
+        Flux<Product> products = productService.findAllWitNameUppercaseRepeat();
 
         model.addAttribute("products", products);
         model.addAttribute("title", "Product list");
@@ -66,10 +57,7 @@ public class ProductController {
 
     @GetMapping("/list-chunked")
     public String listChunked(Model model) {
-        Flux<Product> products = productService.findAll().map(product -> {
-            product.setName(product.getName().toUpperCase());
-            return product;
-        }).repeat(5000);
+        Flux<Product> products = productService.findAllWitNameUppercaseRepeat();
 
         model.addAttribute("products", products);
         model.addAttribute("title", "Product list");

@@ -36,4 +36,17 @@ public class ProductServiceImpl implements ProductService {
         return productDao.delete(product);
     }
 
+    @Override
+    public Flux<Product> findAllWitNameUppercase() {
+        return productDao.findAll().map(product -> {
+            product.setName(product.getName().toUpperCase());
+            return product;
+        });
+    }
+
+    @Override
+    public Flux<Product> findAllWitNameUppercaseRepeat() {
+        return findAllWitNameUppercase().repeat(5000);
+    }
+
 }

@@ -13,4 +13,8 @@ public interface ProductService {
     Mono<Product> save(Product product);
 
     Mono<Void> delete(Product product);
+
+    Flux<Product> findAllWitNameUppercase();
+
+    Flux<Product> findAllWitNameUppercaseRepeat();
 }
