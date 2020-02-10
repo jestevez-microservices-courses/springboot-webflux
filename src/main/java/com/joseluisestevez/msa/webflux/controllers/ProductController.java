@@ -8,12 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable;
 
 import com.joseluisestevez.msa.webflux.models.documents.Product;
 import com.joseluisestevez.msa.webflux.service.ProductService;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Controller
 public class ProductController {
@@ -32,6 +34,18 @@ public class ProductController {
         model.addAttribute("products", products);
         model.addAttribute("title", "Product list");
         return "list";
+    }
+
+    @GetMapping("/form")
+    public Mono<String> create(Model model) {
+        model.addAttribute("product", new Product());
+        model.addAttribute("title", "Product create");
+        return Mono.just("form");
+    }
+
+    @PostMapping("/form")
+    public Mono<String> save(Product product) {
+        return productService.save(product).doOnNext(p -> LOGGER.info("product=[{}]", p)).thenReturn("redirect:/list");
     }
 
     @GetMapping("/list-data-driver")
