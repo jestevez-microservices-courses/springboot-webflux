@@ -1,5 +1,6 @@
 package com.joseluisestevez.msa.webflux.service;
 
+import com.joseluisestevez.msa.webflux.models.documents.Category;
 import com.joseluisestevez.msa.webflux.models.documents.Product;
 
 import reactor.core.publisher.Flux;
@@ -17,4 +18,10 @@ public interface ProductService {
     Flux<Product> findAllWitNameUppercase();
 
     Flux<Product> findAllWitNameUppercaseRepeat();
+
+    Flux<Category> findAllCategory();
+
+    Mono<Category> findCategoryById(String id);
+
+    Mono<Category> saveCategory(Category category);
 }
