@@ -143,6 +143,21 @@ public class ProductController {
         return Mono.just("form");
     }
 
+    @GetMapping("/view/{id}")
+    public Mono<String> view(Model model, @PathVariable String id) {
+        return productService.findById(id).doOnNext(p -> {
+            LOGGER.info("product[{}]", p);
+            model.addAttribute("product", p);
+            model.addAttribute("title", "Product view");
+        }).switchIfEmpty(Mono.just(new Product())).flatMap(p -> {
+            if (p.getId() == null) {
+                return Mono.error(new InterruptedException("The product does not exist"));
+            }
+            return Mono.just(p);
+        }).then(Mono.just("view")).onErrorResume(ex -> Mono.just("redirect:/list?error=The+product+does+not+exist"));
+
+    }
+
     @GetMapping("/list-data-driver")
     public String listDataDriver(Model model) {
         Flux<Product> products = productService.findAllWitNameUppercase().delayElements(Duration.ofSeconds(1));
