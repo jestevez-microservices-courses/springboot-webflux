@@ -11,7 +11,7 @@
 		<a th:href="@{/list}">return</a>
 
 		<form th:action="@{/form}" method="post" th:object="${product}">
-			
+			<input th:if="${product.id != null}" type="hidden" th:field="*{id}" />
 			<div>
 				<label for="name">name</label>
 				<div>
@@ -34,7 +34,7 @@
 			</div>
 			<div>
 				<div>
-					<input type="submit" value="Save" />
+					<input type="submit" th:value="${button}" />
 				</div>
 			</div>
 		</form>

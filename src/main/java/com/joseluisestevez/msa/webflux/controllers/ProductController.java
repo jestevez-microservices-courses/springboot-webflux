@@ -44,6 +44,7 @@ public class ProductController {
     public Mono<String> create(Model model) {
         model.addAttribute("product", new Product());
         model.addAttribute("title", "Product create");
+        model.addAttribute("button", "Create");
         return Mono.just("form");
     }
 
@@ -53,12 +54,29 @@ public class ProductController {
         return productService.save(product).doOnNext(p -> LOGGER.info("product=[{}]", p)).thenReturn("redirect:/list");
     }
 
+    @GetMapping("/form-v2/{id}")
+    public Mono<String> editv2(Model model, @PathVariable String id) {
+        // @SessionAttributes It does not work here
+        return productService.findById(id).doOnNext(p -> {
+            LOGGER.info("product[{}]", p);
+            model.addAttribute("product", p);
+            model.addAttribute("title", "Product edit");
+            model.addAttribute("button", "Edit");
+        }).defaultIfEmpty(new Product()).flatMap(p -> {
+            if (p.getId() == null) {
+                return Mono.error(new InterruptedException("The product does not exist"));
+            }
+            return Mono.just(p);
+        }).then(Mono.just("form")).onErrorResume(ex -> Mono.just("redirect:/list?error=The+product+does+not+exist"));
+    }
+
     @GetMapping("/form/{id}")
     public Mono<String> edit(Model model, @PathVariable String id) {
         Mono<Product> product = productService.findById(id).doOnNext(p -> LOGGER.info("product[{}]", p)).defaultIfEmpty(new Product());
 
         model.addAttribute("product", product);
         model.addAttribute("title", "Product edit");
+        model.addAttribute("button", "Edit");
         return Mono.just("form");
     }
 
