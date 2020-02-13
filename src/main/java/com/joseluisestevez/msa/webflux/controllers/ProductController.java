@@ -1,13 +1,17 @@
 package com.joseluisestevez.msa.webflux.controllers;
 
+import java.io.File;
 import java.time.Duration;
 import java.util.Date;
+import java.util.UUID;
 
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable;
@@ -34,6 +39,9 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+
+    @Value("${config.uploads.path}")
+    private String path;
 
     @ModelAttribute("categories")
     public Flux<Category> categories() {
@@ -60,9 +68,9 @@ public class ProductController {
     }
 
     @PostMapping("/form")
-    public Mono<String> save(@Valid @ModelAttribute("product") Product product, BindingResult bindingResult, SessionStatus status, Model model) {
+    public Mono<String> save(@Valid @ModelAttribute("product") Product product, BindingResult bindingResult, @RequestPart FilePart file,
+            SessionStatus status, Model model) {
         if (bindingResult.hasErrors()) {
-            // model.addAttribute("product", product);
             model.addAttribute("title", "Errores in product");
             model.addAttribute("button", "Save");
             return Mono.just("form");
@@ -77,10 +85,20 @@ public class ProductController {
             if (product.getCreateAt() == null) {
                 product.setCreateAt(new Date());
             }
+
+            if (!file.filename().isEmpty()) {
+                product.setPhoto(UUID.randomUUID().toString() + "-" + file.filename().replace(" ", "").replace(":", "").replace("\\", ""));
+            }
+
             return productService.save(product);
         }).doOnNext(p -> {
             LOGGER.info("category=[{}]", p.getCategory());
             LOGGER.info("product=[{}]", p);
+        }).flatMap(p -> {
+            if (!file.filename().isEmpty()) {
+                return file.transferTo(new File(path + p.getPhoto()));
+            }
+            return Mono.empty();
         }).thenReturn("redirect:/list?success=product+saved+successfully");
     }
 

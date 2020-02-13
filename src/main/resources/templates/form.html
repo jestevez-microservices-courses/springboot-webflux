@@ -10,8 +10,9 @@
 	<div>
 		<a th:href="@{/list}">return</a>
 
-		<form th:action="@{/form}" method="post" th:object="${product}">
-<!-- 			<input th:if="${product.id != null}" type="hidden" th:field="*{id}" /> -->
+		<form th:action="@{/form}" method="post" th:object="${product}" enctype="multipart/form-data">
+			<input th:if="${product.id != null}" type="hidden" th:field="*{id}" />
+			<input th:if="${product.photo != null}" type="hidden" th:field="*{photo}" />
 			<div>
 				<label for="name">name</label>
 				<div>
@@ -42,6 +43,12 @@
 					
 				</div>
 				<small th:if="${#fields.hasErrors('category.id')}" th:errors="*{category.id}"></small>
+			</div>
+			<div>
+				<label for="file">Picture</label>
+				<div>
+					<input type="file" name="file" />
+				</div>
 			</div>
 			<div>
 				<div>
