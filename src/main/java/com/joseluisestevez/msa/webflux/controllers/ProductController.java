@@ -70,6 +70,21 @@ public class ProductController {
                 .thenReturn("redirect:/list?success=product+saved+successfully");
     }
 
+    @GetMapping("/delete/{id}")
+    public Mono<String> delete(@PathVariable String id) {
+        return productService.findById(id).defaultIfEmpty(new Product()).flatMap(p -> {
+            if (p.getId() == null) {
+                return Mono.error(new InterruptedException("The product does not exist"));
+            }
+            return Mono.just(p);
+        }).flatMap(product -> {
+            LOGGER.info("Delete product [{}]", product);
+            return productService.delete(product);
+        }).then(Mono.just("redirect:/list?success=product+deleted+successfully"))
+                .onErrorResume(ex -> Mono.just("redirect:/list?error=The+product+does+not+exist"));
+
+    }
+
     @GetMapping("/form-v2/{id}")
     public Mono<String> editv2(Model model, @PathVariable String id) {
         // @SessionAttributes It does not work here
