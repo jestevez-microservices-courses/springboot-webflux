@@ -1,13 +1,18 @@
 package com.joseluisestevez.msa.webflux.controllers;
 
 import java.time.Duration;
+import java.util.Date;
+
+import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -49,9 +54,20 @@ public class ProductController {
     }
 
     @PostMapping("/form")
-    public Mono<String> save(Product product, SessionStatus status) {
+    public Mono<String> save(@Valid @ModelAttribute("product") Product product, BindingResult bindingResult, SessionStatus status, Model model) {
+        if (bindingResult.hasErrors()) {
+            // model.addAttribute("product", product);
+            model.addAttribute("title", "Errores in product");
+            model.addAttribute("button", "Save");
+            return Mono.just("form");
+        }
+
         status.setComplete();
-        return productService.save(product).doOnNext(p -> LOGGER.info("product=[{}]", p)).thenReturn("redirect:/list");
+        if (product.getCreateAt() == null) {
+            product.setCreateAt(new Date());
+        }
+        return productService.save(product).doOnNext(p -> LOGGER.info("product=[{}]", p))
+                .thenReturn("redirect:/list?success=product+saved+successfully");
     }
 
     @GetMapping("/form-v2/{id}")

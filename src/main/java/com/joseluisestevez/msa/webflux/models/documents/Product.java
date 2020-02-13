@@ -2,6 +2,9 @@ package com.joseluisestevez.msa.webflux.models.documents;
 
 import java.util.Date;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -11,7 +14,10 @@ public class Product {
     @Id
     private String id;
 
+    @NotEmpty
     private String name;
+
+    @NotNull
     private Double price;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
