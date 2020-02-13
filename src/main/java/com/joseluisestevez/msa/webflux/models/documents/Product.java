@@ -2,6 +2,7 @@ package com.joseluisestevez.msa.webflux.models.documents;
 
 import java.util.Date;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -23,6 +24,7 @@ public class Product {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date createAt;
 
+    @Valid
     private Category category;
 
     public Product() {

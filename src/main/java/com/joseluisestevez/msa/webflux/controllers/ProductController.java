@@ -69,11 +69,19 @@ public class ProductController {
         }
 
         status.setComplete();
-        if (product.getCreateAt() == null) {
-            product.setCreateAt(new Date());
-        }
-        return productService.save(product).doOnNext(p -> LOGGER.info("product=[{}]", p))
-                .thenReturn("redirect:/list?success=product+saved+successfully");
+
+        Mono<Category> category = productService.findCategoryById(product.getCategory().getId());
+
+        return category.flatMap(c -> {
+            product.setCategory(c);
+            if (product.getCreateAt() == null) {
+                product.setCreateAt(new Date());
+            }
+            return productService.save(product);
+        }).doOnNext(p -> {
+            LOGGER.info("category=[{}]", p.getCategory());
+            LOGGER.info("product=[{}]", p);
+        }).thenReturn("redirect:/list?success=product+saved+successfully");
     }
 
     @GetMapping("/delete/{id}")

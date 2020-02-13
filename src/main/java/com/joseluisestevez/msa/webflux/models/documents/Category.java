@@ -1,10 +1,13 @@
 package com.joseluisestevez.msa.webflux.models.documents;
 
+import javax.validation.constraints.NotEmpty;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "categories")
 public class Category {
+    @NotEmpty
     @Id
     private String id;
 
