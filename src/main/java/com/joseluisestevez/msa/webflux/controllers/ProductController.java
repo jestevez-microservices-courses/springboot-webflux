@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable;
 
+import com.joseluisestevez.msa.webflux.models.documents.Category;
 import com.joseluisestevez.msa.webflux.models.documents.Product;
 import com.joseluisestevez.msa.webflux.service.ProductService;
 
@@ -33,6 +34,11 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+
+    @ModelAttribute("categories")
+    public Flux<Category> categories() {
+        return productService.findAllCategory();
+    }
 
     @GetMapping({ "/list", "/" })
     public String list(Model model) {
